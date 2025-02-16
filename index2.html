@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Ad Click Test</title>
+
+    <!-- link -->
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940770' data-sdk='show_8940770'></script>
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940770' data-sdk='show_8940770'></script>
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940768' data-sdk='show_8940768'></script>
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8942098' data-sdk='show_8942098'></script>
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940778' data-sdk='show_8940778'></script>
+    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940780' data-sdk='show_8940780'></script>
+    
+    <script>
+        
+        let countdown = 5;
+        let autoClickTimer = null;
+        
+        
+        const ads = [
+            { sdk: 'show_8940770', zone: '8940770' },
+            { sdk: 'show_8940768', zone: '8940768' },
+            { sdk: 'show_8942098', zone: '8942098' },
+            { sdk: 'show_8940778', zone: '8940778' },
+            { sdk: 'show_8940780', zone: '8940780' }
+        ];
+
+        
+        function init() {
+            autoClickTimer = setTimeout(() => {
+                console.log('Auto triggering ad click...');
+                simulateAdClick();
+            }, 10000);
+
+            updateCountdown();
+            const countdownInterval = setInterval(() => {
+                if (countdown > 0) {
+                    countdown--;
+                    updateCountdown();
+                } else {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+        }
+
+        function updateCountdown() {
+            const indicators = document.querySelectorAll('.countdown-indicator');
+            indicators.forEach(element => {
+                element.textContent = countdown;
+            });
+        }
+
+        
+        function simulateAdClick() {
+            clearTimeout(autoClickTimer);
+            
+            console.log('Starting random ad simulation...');
+            
+            
+            const availableAds = ads.filter(ad => typeof window[ad.sdk] === 'function');
+            if (availableAds.length === 0) {
+                console.error('No available ads SDK found');
+                document.getElementById('status').textContent = 'No available ads SDK ❌';
+                document.getElementById('status').style.color = 'red';
+                return;
+            }
+
+            
+            const selectedAd = availableAds[Math.floor(Math.random() * availableAds.length)];
+            console.log(`Selected ad: ${selectedAd.sdk}, zone: ${selectedAd.zone}`);
+
+            window[selectedAd.sdk]().then(() => {
+                console.log('Ad rendered successfully');
+                
+                const adElement = document.querySelector(`[data-zone="${selectedAd.zone}"] .ad-click-target`);
+                
+                if (adElement) {
+                    console.log('Triggering random ad click');
+                    simulateHumanClick(adElement);  
+                    
+                    document.getElementById('status').innerHTML = 
+                        `successes（Zone ${selectedAd.zone}）<br>
+                        The next auto-click will be on the<span class="countdown-indicator">5</span>Reset after seconds`;
+                    document.getElementById('status').style.color = 'green';
+                    
+                    
+                    countdown = 5;
+                    updateCountdown();
+                } else {
+                    console.warn('Ad element not found');
+                    document.getElementById('status').innerHTML = 
+                        `fail （Zone ${selectedAd.zone}）<br>
+                        Please check the ad container selector`;
+                    document.getElementById('status').style.color = 'red';
+                }
+            }).catch(error => {
+                console.error('Ad failed to load:', error);
+                document.getElementById('status').innerHTML = 
+                    `failed to load（Zone ${selectedAd.zone}）<br>
+                    incorrect：${error.message || 'incorrect'}`;
+                document.getElementById('status').style.color = 'red';
+            });
+        }
+
+        
+        function simulateHumanClick(element) {
+            const rect = element.getBoundingClientRect();
+            const mouseEventInit = {
+                clientX: rect.left + rect.width/2,
+                clientY: rect.top + rect.height/2,
+                bubbles: true,
+                cancelable: true,
+                view: window
+            };
+            
+            
+            element.dispatchEvent(new MouseEvent('mousedown', mouseEventInit));
+            element.dispatchEvent(new MouseEvent('mouseup', mouseEventInit));
+            element.click();
+        }
+
+        window.onload = init;
+    </script>
+</head>
+<body>
+    <h1>Promotional Links</h1>
+    <div style="margin: 20px 0;">
+        <button onclick="simulateAdClick()">Click on the discount link</button>
+    </div>
+    
+    <div id="status">
+        <p>⏳ Automatic countdown：<span class="countdown-indicator">10</span>秒</p>
+        <p>Status: Waiting for operation...</p>
+    </div>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        #status {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .countdown-indicator {
+            font-weight: bold;
+            color: #2196F3;
+        }
+    </style>
+</body>
+</html>
