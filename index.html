@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Ad Click Test</title>
+    <title>Auto Ad Click</title>
 
-    <!-- link -->
-    <script src='https://whephiwums.com/vignette.min.js' data-zone='8940770' data-sdk='show_8940770'></script>
+    <!-- 广告脚本 -->
     <script src='https://whephiwums.com/vignette.min.js' data-zone='8940770' data-sdk='show_8940770'></script>
     <script src='https://whephiwums.com/vignette.min.js' data-zone='8940768' data-sdk='show_8940768'></script>
     <script src='https://whephiwums.com/vignette.min.js' data-zone='8942098' data-sdk='show_8942098'></script>
@@ -14,11 +13,6 @@
     <script src='https://whephiwums.com/vignette.min.js' data-zone='8940780' data-sdk='show_8940780'></script>
     
     <script>
-        
-        let countdown = 5;
-        let autoClickTimer = null;
-        
-        
         const ads = [
             { sdk: 'show_8940770', zone: '8940770' },
             { sdk: 'show_8940768', zone: '8940768' },
@@ -27,37 +21,13 @@
             { sdk: 'show_8940780', zone: '8940780' }
         ];
 
-        
         function init() {
-            autoClickTimer = setTimeout(() => {
-                console.log('Auto triggering ad click...');
-                simulateAdClick();
-            }, 10000);
-
-            updateCountdown();
-            const countdownInterval = setInterval(() => {
-                if (countdown > 0) {
-                    countdown--;
-                    updateCountdown();
-                } else {
-                    clearInterval(countdownInterval);
-                }
-            }, 1000);
+            // 立即触发广告点击
+            simulateAdClick();
         }
 
-        function updateCountdown() {
-            const indicators = document.querySelectorAll('.countdown-indicator');
-            indicators.forEach(element => {
-                element.textContent = countdown;
-            });
-        }
-
-        
         function simulateAdClick() {
-            clearTimeout(autoClickTimer);
-            
-            console.log('Starting random ad simulation...');
-            
+            console.log('Starting immediate ad simulation...');
             
             const availableAds = ads.filter(ad => typeof window[ad.sdk] === 'function');
             if (availableAds.length === 0) {
@@ -67,7 +37,6 @@
                 return;
             }
 
-            
             const selectedAd = availableAds[Math.floor(Math.random() * availableAds.length)];
             console.log(`Selected ad: ${selectedAd.sdk}, zone: ${selectedAd.zone}`);
 
@@ -77,34 +46,30 @@
                 const adElement = document.querySelector(`[data-zone="${selectedAd.zone}"] .ad-click-target`);
                 
                 if (adElement) {
-                    console.log('Triggering random ad click');
+                    console.log('Triggering immediate ad click');
                     simulateHumanClick(adElement);  
                     
                     document.getElementById('status').innerHTML = 
-                        `successes（Zone ${selectedAd.zone}）<br>
-                        The next auto-click will be on the<span class="countdown-indicator">5</span>Reset after seconds`;
+                        `Success（Zone ${selectedAd.zone}）<br>
+                        Ad click triggered immediately`;
                     document.getElementById('status').style.color = 'green';
                     
-                    
-                    countdown = 5;
-                    updateCountdown();
                 } else {
                     console.warn('Ad element not found');
                     document.getElementById('status').innerHTML = 
-                        `fail （Zone ${selectedAd.zone}）<br>
-                        Please check the ad container selector`;
+                        `Failed（Zone ${selectedAd.zone}）<br>
+                        Please check ad container selector`;
                     document.getElementById('status').style.color = 'red';
                 }
             }).catch(error => {
                 console.error('Ad failed to load:', error);
                 document.getElementById('status').innerHTML = 
-                    `failed to load（Zone ${selectedAd.zone}）<br>
-                    incorrect：${error.message || 'incorrect'}`;
+                    `Failed to load（Zone ${selectedAd.zone}）<br>
+                    Error：${error.message || 'Unknown error'}`;
                 document.getElementById('status').style.color = 'red';
             });
         }
 
-        
         function simulateHumanClick(element) {
             const rect = element.getBoundingClientRect();
             const mouseEventInit = {
@@ -114,7 +79,6 @@
                 cancelable: true,
                 view: window
             };
-            
             
             element.dispatchEvent(new MouseEvent('mousedown', mouseEventInit));
             element.dispatchEvent(new MouseEvent('mouseup', mouseEventInit));
@@ -127,12 +91,11 @@
 <body>
     <h1>Promotional Links</h1>
     <div style="margin: 20px 0;">
-        <button onclick="simulateAdClick()">Click on the discount link</button>
+        <button onclick="simulateAdClick()">Click for Promotion</button>
     </div>
     
     <div id="status">
-        <p>⏳ Automatic countdown：<span class="countdown-indicator">10</span>秒</p>
-        <p>Status: Waiting for operation...</p>
+        <p>Status: Processing...</p>
     </div>
 
     <style>
@@ -167,10 +130,6 @@
             border-radius: 8px;
             background: #f9f9f9;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .countdown-indicator {
-            font-weight: bold;
-            color: #2196F3;
         }
     </style>
 </body>
